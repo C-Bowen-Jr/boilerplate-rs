@@ -6,7 +6,10 @@ use serde::{Serialize, Deserialize};
 use yansi::{Paint,Color};
 //use serde_json::{Key, Value};
 
-#[derive(Debug, Serialize, Deserialize)]
+// Boilerplate is a bit overkill of a template, but covers a lot
+// of my most used crates and features. Get coding faster.
+
+#[derive(Default, Debug, PartialEq, Serialize, Deserialize)]
 struct JsonObject {
     name: String,
 }
@@ -23,6 +26,12 @@ fn load_json_to_string(file_path: String) -> String {
     fs::read_to_string(file_path).unwrap_or_default()
 }
 
+// Depending on JSON format and usage, Vec<JsonObject>
+fn json_object(json_string: String) -> JsonObject {
+    serde_json::from_str(&load_json_to_string(json_string))
+    .unwrap_or_default()
+}
+
 fn main() {
     let _time_thread = thread::spawn(|| {
         for _i in 0..10 {
@@ -32,9 +41,10 @@ fn main() {
     });
 
     let mut choice = String::new();
+    let save_file = json_object("./src/some.json".to_owned());
     while choice != "quit" {
         choice = user_input().trim().to_lowercase().replace("\n","");
-        println!(" > {}", load_json_to_string("./src/some.json".to_owned()));
+        println!(" >{}", save_file.name);
     }
 
     //time_thread.join().unwrap();
